@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Servidor {
+public class EnqueteServidor {
     public static void main(String[] args) throws RemoteException, AlreadyBoundException, InterruptedException {
         Registry referenciaServicoNomes = LocateRegistry.createRegistry(1099);
         InterfaceServ referenciaServidor = new ServImpl();

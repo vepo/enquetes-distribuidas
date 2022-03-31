@@ -23,6 +23,14 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * Implementação do serviço de enquetes.
+ * Para expirar as enquetes, ele possue um timer que a cada
+ * minuto verificará as enquetes já expiradas.
+ * A interface {@link AutoCloseable} é responsável por evitar leak desse timer.
+ * 
+ * <b>Observação</b>: O modelo de dados não está bom, precisa ser refatorado para ficar evitar inconsistências.
+ */
 public class EnqueteServiceImpl extends UnicastRemoteObject implements EnqueteService, AutoCloseable {
 
     private Map<String, EnqueteSubscriber> subscribers;
@@ -83,16 +91,16 @@ public class EnqueteServiceImpl extends UnicastRemoteObject implements EnqueteSe
         subscriberList.add(enquete.getCriador());
         enqueteSubscribers.put(enquete.getId(), subscriberList);
         subscribers.entrySet()
-                .stream()
-                .filter(entry -> !entry.getKey().equals(enquete.getCriador()))
-                .forEach(entry -> {
-                    try {
-                        entry.getValue().novaEnquete(enquete);
-                    } catch (RemoteException e) {
-                        System.err.println("Observador não acessível! Removendo...");
-                        subscribers.remove(entry.getKey());
-                    }
-                });
+                   .stream()
+                   .filter(entry -> !entry.getKey().equals(enquete.getCriador()))
+                   .forEach(entry -> {
+                       try {
+                           entry.getValue().novaEnquete(enquete);
+                       } catch (RemoteException e) {
+                           System.err.println("Observador não acessível! Removendo...");
+                           subscribers.remove(entry.getKey());
+                       }
+                   });
         return enquete;
     }
 
@@ -210,20 +218,24 @@ public class EnqueteServiceImpl extends UnicastRemoteObject implements EnqueteSe
 
     private Set<ResultadoEnquete> construirResultados(Enquete enquete) {
         List<Voto> votosDaEnquete = votos.get(enquete.getId());
-        System.out.println("Construindo resultados... enquete=" + enquete + " votos=" + votos);
-        return enquete.getOpcoes()
-                      .stream()
-                      .map(opcao -> { 
-                          AtomicInteger qtdVotos = new AtomicInteger(0);
-                          List<String> votantes = new ArrayList<>();
-                          votosDaEnquete.forEach(voto -> {
-                              if (voto.getVotos().contains(enquete.getOpcoes().indexOf(opcao))) {
-                                  qtdVotos.incrementAndGet();
-                                  votantes.add(voto.getNomeUsuario());
-                              }
-                          });
-                          return new ResultadoEnquete(opcao, votantes, qtdVotos.get());
-                      })
-                      .collect(Collectors.toSet());
+        System.out.println("Construindo resultados... enquete=" + enquete + " votos=" + votosDaEnquete);
+        if (Objects.nonNull(votosDaEnquete)) {
+            return enquete.getOpcoes()
+                          .stream()
+                          .map(opcao -> { 
+                              AtomicInteger qtdVotos = new AtomicInteger(0);
+                              List<String> votantes = new ArrayList<>();
+                              votosDaEnquete.forEach(voto -> {
+                                  if (voto.getVotos().contains(enquete.getOpcoes().indexOf(opcao))) {
+                                      qtdVotos.incrementAndGet();
+                                      votantes.add(voto.getNomeUsuario());
+                                    }
+                                });
+                                return new ResultadoEnquete(opcao, votantes, qtdVotos.get());
+                          })
+                          .collect(Collectors.toSet());
+        } else {
+            return Collections.emptySet();
+        }
     }
 }

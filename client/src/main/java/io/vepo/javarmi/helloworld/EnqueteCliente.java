@@ -1,7 +1,6 @@
 package io.vepo.javarmi.helloworld;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -36,8 +35,12 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
-
-@Command(name = "enquete-cli", mixinStandardHelpOptions = true, version = "Cliente Enquete 1.0", description = "Cliente para acesso a enquetes.")
+/**
+ * A lógica do cliente é simples, imprime o menu na tela e o usuário deve escolher 
+ * uma opção. Quando chegam notificações, elas são impressas na tela.
+ */
+@Command(name = "enquete-cli", mixinStandardHelpOptions = true, 
+        version = "Cliente Enquete 1.0", description = "Cliente para acesso a enquetes.")
 public class EnqueteCliente implements Callable<Integer> {
 
     private static final int ERRO_SERVIDOR_NAO_ACESSIVEL = 1;
@@ -195,11 +198,19 @@ public class EnqueteCliente implements Callable<Integer> {
     }
 
     private void novaEnquete(Enquete enquete) {
+        System.out.println();
+        System.out.println("-----------------------------------------------------");
+        System.out.println("Nova enquete! enquete=" + enquete);
+        System.out.println("-----------------------------------------------------");
         enqueteRecebida.set(true);
         enquetesNaoRespondidas.add(enquete);
     }
 
     private void enqueteFinalizada(Enquete enquete) {
+        System.out.println();
+        System.out.println("-----------------------------------------------------");
+        System.out.println("Enquete finalizada! enquete=" + enquete);
+        System.out.println("-----------------------------------------------------");
         enqueteRecebida.set(true);
         enquetesNaoRespondidas.removeIf(e -> e.getId().equals(enquete.getId()));
     }
@@ -328,7 +339,6 @@ public class EnqueteCliente implements Callable<Integer> {
     }
 
     private void criarEnequete() {
-        System.out.println(Charset.defaultCharset());
         console.limpaBuffer();
         System.out.println("Criando Enquete...");
         System.out.print("Titulo: ");

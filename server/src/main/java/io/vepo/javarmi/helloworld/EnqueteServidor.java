@@ -10,6 +10,9 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 
+/**
+ * O servidor será responsável por cadastrar os serviços.
+ */
 @Command(name = "enquete-server", mixinStandardHelpOptions = true, 
          version = "Servidor Enquete 1.0", description = "Servidor de enquetes.")
 public class EnqueteServidor implements Callable<Integer> {
@@ -36,7 +39,6 @@ public class EnqueteServidor implements Callable<Integer> {
         Registry referenciaServicoNomes = LocateRegistry.createRegistry(port);
         try(EnqueteServiceImpl referenciaServidor = new EnqueteServiceImpl()) {
             referenciaServicoNomes.rebind("Enquete", referenciaServidor);
-            
             while (running.get()) {
                 Thread.sleep(500);
             }

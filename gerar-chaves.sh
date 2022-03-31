@@ -10,3 +10,7 @@ openssl rsa -in chaves/cliente-1 -pubout -outform DER -out chaves/cliente-1.pub
 openssl genrsa -out chaves/cliente-2 2048
 openssl pkcs8 -topk8 -inform PEM -outform DER -in chaves/cliente-2 -out chaves/cliente-2.key -nocrypt
 openssl rsa -in chaves/cliente-2 -pubout -outform DER -out chaves/cliente-2.pub
+
+openssl genrsa -out chaves/cliente-3 2048
+openssl pkcs8 -topk8 -inform PEM -outform DER -in chaves/cliente-3 -out chaves/cliente-3.key -nocrypt
+openssl rsa -in chaves/cliente-3 -pubout -outform DER -out chaves/cliente-3.pub

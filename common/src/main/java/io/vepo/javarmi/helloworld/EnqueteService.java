@@ -73,12 +73,13 @@ public interface EnqueteService extends Remote {
     /**
      * Consulta resultado de enquete cadastrada.
      * 
-     * @param enqueteId  Id da enquete
-     * @param assinatura Assinatura contendo IdEnquete + Titulo + Nome do usuário
-     *                   assinado pela chave privada do autor da enquete.
+     * @param enqueteId   Id da enquete
+     * @param nomeUsuario Nome do usuário que está requerindo o resultado
+     * @param assinatura  Assinatura contendo IdEnquete + Titulo + Nome do usuário
+     *                    assinado pela chave privada do autor da enquete.
      * @return Resultados caso a assinatura seja validada. null caso contrário.
      * @throws RemoteException Erro ao acessar cliente. Provavelmente o
      *                         cliente não está disponível.
      */
-    public abstract Set<ResultadoEnquete> verResultados(String enqueteId, byte[] assinatura) throws RemoteException;
+    public abstract Set<ResultadoEnquete> verResultados(String enqueteId, String nomeUsuario, byte[] assinatura) throws RemoteException;
 }

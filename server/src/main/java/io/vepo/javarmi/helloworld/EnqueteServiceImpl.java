@@ -188,26 +188,32 @@ public class EnqueteServiceImpl extends UnicastRemoteObject implements EnqueteSe
     }
 
     @Override
-    public Set<ResultadoEnquete> verResultados(String idEnquete, byte[] assinatura) throws RemoteException {
+    public Set<ResultadoEnquete> verResultados(String idEnquete, String nomeUsuario, byte[] assinatura) throws RemoteException {
         Optional<Enquete> talvezEnquete = encontrarEnquete(idEnquete);
         if (talvezEnquete.isPresent()) {
             Enquete enquete = talvezEnquete.get();
-            try {
-                Signature clientSig = Signature.getInstance("SHA256withRSA");
-                clientSig.initVerify(chavesPublicas.get(enquete.getCriador()));
-                clientSig.update((enquete.getId() + enquete.getTitulo() + enquete.getCriador()).getBytes());
+            if (enquete.getCriador().equals(nomeUsuario) || 
+                votos.get(idEnquete).stream().anyMatch(voto -> voto.getNomeUsuario().equals(nomeUsuario))) {
+                try {
+                    Signature clientSig = Signature.getInstance("SHA256withRSA");
+                    clientSig.initVerify(chavesPublicas.get(nomeUsuario));
+                    clientSig.update((enquete.getId() + enquete.getTitulo() + nomeUsuario).getBytes());
 
-                if (clientSig.verify(assinatura)) {
-                    //Mensagem corretamente assinada
-                    System.out.println("A Mensagem recebida foi assinada corretamente.");
-                    return construirResultados(enquete);
-                } else {
-                    //Mensagem não pode ser validada
-                    System.out.println("A Mensagem recebida NÃO pode ser validada.");
+                    if (clientSig.verify(assinatura)) {
+                        //Mensagem corretamente assinada
+                        System.out.println("A Mensagem recebida foi assinada corretamente.");
+                        return construirResultados(enquete);
+                    } else {
+                        //Mensagem não pode ser validada
+                        System.out.println("A Mensagem recebida NÃO pode ser validada.");
+                        return null;
+                    }
+                } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                    System.err.println("Erro ao validar assinatura!");
                     return null;
                 }
-            } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-                System.err.println("Erro ao validar assinatura!");
+            } else {
+                System.err.println("Usuário não pode visualizar resultados!");
                 return null;
             }
         } else {

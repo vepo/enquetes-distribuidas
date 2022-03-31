@@ -293,7 +293,7 @@ public class EnqueteCliente implements Callable<Integer> {
                 } else {
                     Enquete enquete = enquetes.get(opcao - 1);
                     try {
-                        Set<ResultadoEnquete> resultados = enqueteService.verResultados(enquete.getId(), assinar(enquete.getId() + enquete.getTitulo() + nomeUsuario));
+                        Set<ResultadoEnquete> resultados = enqueteService.verResultados(enquete.getId(), nomeUsuario, assinar(enquete.getId() + enquete.getTitulo() + nomeUsuario));
                         if (Objects.nonNull(resultados)) {
                             resultados.forEach(resultado -> System.out.println("Opção " + FORMATTER.format(resultado.getOpcao()) + 
                                                                                 ": #votos=" + resultado.getVotos() + 

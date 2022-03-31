@@ -61,3 +61,8 @@ O modulo `client` implementará uma interface CLI para cadastro de enquetes.
 * [ ] Requerer resultados no Cliente 2
 * [ ] Requerer resultados no Cliente 1
 * [ ] Cadastrar enquete com data limite no passado
+
+## Known Issues
+
+* O cadastro de enquetes não valida a cronologia das datas (podem ser criadas enquetes já expiradas ou com opções no passado)
+* O cadastro não valida unicidade de enquetes. Podem ser criadas enquetes com mesmo título e com opções repetidas.
